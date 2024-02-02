@@ -1,37 +1,36 @@
 # flink-platform-web
 
-> This project is a job scheduling framework with center less structure, easy to scale up.
-> We can customize the workflow DAG and schedule it.
+- 本项目基于进行二次开发：https://github.com/itinycheng/flink-platform-backend 感谢作者大佬的指点！
+>该项目是一个无中心结构的作业调度框架，易于扩展。
+>我们可以自定义工作流DAG并安排它。
 
-[preview video](https://user-images.githubusercontent.com/14097070/181010270-af6209f5-3c77-4743-bda0-672469524e7e.mov)
+[演示](https://user-images.githubusercontent.com/14097070/181010270-af6209f5-3c77-4743-bda0-672469524e7e.mov)
 
-## Overview
+## 综述
 
-1. [Quick Start](docs/startup.md)
-2. [Configuration Details](docs/configuration.md)
-3. [Architecture Design](docs/architecture.md)
+1. [快速开始](docs/startup.md)
+2. [配置细节](docs/configuration.md)
+3. [架构设计](docs/architecture.md)
 
 ![arch](docs/img/arch_overview.png)
+![arch](docs/img/show.png)
 
-- WebUI: Frontend files are in a separate project written in vue, please
-  visit [flink-platform-frontend](https://github.com/itinycheng/flink-platform-frontend).
-- Platform Instance: The instance for manage, configuration and scheduling workflow, easy to scale.
-- HDFS: Used to store resource files, such as jar, udf, etc.
-- Mysql: Holds all info about jobs, users, resources, schedules, etc. To keep the system simple, I
-  plan to use mysql to guarantee fault-tolerance.
+- WebUI:前端文件在一个用vue编写的单独项目中，请访问[flink平台前端](https://github.com/itinycheng/flink-platform-frontend).同时本工程也集成了前端，直接在本工程的ui工程下运行npm install 和 npm run dev即可
+- 平台实例：用于管理、配置和调度工作流的实例，易于扩展。
+- HDFS：用于存储资源文件，如jar、udf等。
+- Mysql：保存所有关于作业、用户、资源、时间表等的信息。为了保持系统简单，所有的实例都依赖同一个mysql
 
-## Task Support
+## 任务
 
-- Flink sql/jar, deployment mode: YARN-Per-Job(tested), Other(untested).
-- Shell (tested).
-- SQL(ClickHouse/Mysql/Hive/TiDB tested).
-- Condition(tested, support: AND, OR).
-- Dependent(tested).
+- Flink sql/jar，部署模式：YARN Per Job（已测试），Other（未测试）。
+- Shell （已测试）。
+- SQL（ClickHouse/Mysql/Hive/TiDB测试）。
+- Condition（已测试，支持：AND，OR）。
+- Dependent（已测试）。
+- Spark （支持cluster 和 client模式，已测试）
 
-- More: I don't have enough time to develop multi type task support, but implementing a new task
-  type is easy, sometimes you can do it yourself or tell me your needs.
 
-## Metadata
+## 元数据信息
 
 | Table Name     | Description                                                    |
 |:---------------|:---------------------------------------------------------------|
@@ -47,9 +46,9 @@
 | t_worker       | Worker node instance info.                                     |
 | t_datasource   | Store datasource info, such as: clickhouse, mysql, etc.        |
 
-Refer to: [create table statements](docs/sql/schema.sql)
+参加奥: [create table statements](docs/sql/schema.sql)
 
-## Build and Run
+## 构建与执行
 
 ```bash
 # clone the project
@@ -78,3 +77,11 @@ nohup java -Xms4g -Xmx4g -jar -Dspring.profiles.active=dev flink-platform-web-0.
 ## License
 
 [Apache-2.0](LICENSE) license.
+
+# 细节
+- 建议：启用多个实例，本地实例用于提交任务，远程实例用于执行。在远程服务器上启用dev配置，本地可以使用docker或者dev，mysql都链接服务器的mysql。
+- application-dev.yaml下，记得更改flink执行路径。
+- 本地可以使用docker启动实例，使用docker环境，即执行docker-compose，数据库会自动建好。也可以使用idea直接启动，使用dev环境
+- 远程执行需要安装mysql8.0.32，和jdk21。作者用CDH组件虚拟三节点集群（机器内存至少32GB以上），需要搭建好的虚拟机的请联系作者。
+- 我们需要在storage工程下，flink-platform-storage/flink-platform-storage-base/src/main/resources/storage-dev.yml，对文件目录进行修改，远程使用hdfs，本机使用local。
+- 对于grpc，需要安装grpc插件同时打包本工程才能正常使用。grpc建议使用本maven下版本。
