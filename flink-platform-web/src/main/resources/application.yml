@@ -1,0 +1,34 @@
+# 默认配置，无论启用dev还是docker都会加载
+spring:
+  profiles:
+    active: dev # 启用的配置 如果是本地启动 采用dev环境，同时对storage-dev使用local配置
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 500MB
+      max-request-size: 500MB
+  config:
+    import: classpath:storage-${spring.profiles.active}.yml
+
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  info:
+    env.enabled: true
+    java.enabled: true
+    os.enabled: true
+  endpoint:
+    env:
+      show-values: never
+    health:
+      show-details: always
+  endpoints:
+    web:
+      base-path: /actuator
+      exposure:
+        include: '*'
+
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
